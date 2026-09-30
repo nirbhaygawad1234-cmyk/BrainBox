@@ -3,9 +3,33 @@ import sqlite3
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
 app.secret_key = os.environ.get("SECRET_KEY", "brainbox-demo-secret-key-change-me")
-DATABASE = os.path.join(os.path.dirname(__file__), "brainbox.db")
+
+def get_database_path():
+    if os.environ.get("DATABASE_PATH"):
+        return os.environ.get("DATABASE_PATH")
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        return "/tmp/brainbox.db"
+    
+    local_path = os.path.join(BASE_DIR, "brainbox.db")
+    try:
+        test_file = os.path.join(BASE_DIR, ".db_write_test")
+        with open(test_file, "w") as f:
+            f.write("ok")
+        os.remove(test_file)
+        return local_path
+    except Exception:
+        import tempfile
+        return os.path.join(tempfile.gettempdir(), "brainbox.db")
+
+DATABASE = get_database_path()
 
 SUBJECTS = {
     "Python": ["Basics", "Functions", "OOP"],
@@ -56,7 +80,8 @@ QUESTIONS = [
 ]
 
 def get_db():
-    conn = sqlite3.connect(DATABASE)
+    db_path = get_database_path()
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -116,6 +141,22 @@ def init_db():
             VALUES (?,?,?,?,?,?,?,?)""", QUESTIONS)
     conn.commit()
     conn.close()
+
+def ensure_db_initialized():
+    try:
+        conn = get_db()
+        table = conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='questions'").fetchone()
+        conn.close()
+        if not table:
+            init_db()
+    except Exception:
+        init_db()
+
+@app.before_request
+def auto_init_db():
+    if not getattr(app, "_db_initialized", False):
+        ensure_db_initialized()
+        app._db_initialized = True
 
 def login_required(view):
     @wraps(view)
