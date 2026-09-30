@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="badge">Academic Learning Platform</span>
+    <h1>Learn. Test. <span>Improve.</span></h1>
+    <p>Practice topic-wise quizzes, track your performance and discover which topics need more revision.</p>
+    {% if session.get('user_id') %}
+      <a class="button" href="{{ url_for('dashboard') }}">Open Dashboard</a>
+    {% else %}
+      <a class="button" href="{{ url_for('register') }}">Get Started</a>
+      <a class="button secondary" href="{{ url_for('login') }}">Login</a>
+    {% endif %}
+  </div>
+  <div class="hero-card">
+    <div class="score-circle">80%</div>
+    <h3>Personalized Progress</h3>
+    <p>Focus your revision on topics where your performance is lower.</p>
+  </div>
+</section>
+<section class="cards three">
+  <div class="card"><h3>Topic-wise Quizzes</h3><p>Choose a subject and topic and practice focused questions.</p></div>
+  <div class="card"><h3>Instant Results</h3><p>Get automatic scoring immediately after submitting a quiz.</p></div>
+  <div class="card"><h3>Revision Suggestions</h3><p>Identify weaker topics using your previous quiz performance.</p></div>
+</section>
+{% endblock %}

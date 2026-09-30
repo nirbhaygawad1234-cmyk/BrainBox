@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+brainbox.db
+.env
+.venv/
+venv/
