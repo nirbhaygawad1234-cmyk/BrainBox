@@ -4,62 +4,38 @@ import sqlite3
 import tempfile
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-import jinja2
 
-# Directory of this file (works both in root and api/ subfolder)
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(CURRENT_DIR)
+# Base directory for api
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# Possible template directories
-template_search_dirs = [
-    os.path.join(CURRENT_DIR, "templates"),
-    os.path.join(PARENT_DIR, "templates"),
-    os.path.join(os.getcwd(), "templates"),
-    os.path.join(os.getcwd(), "api", "templates"),
-    "/var/task/api/templates",
-    "/var/task/templates",
-]
-valid_template_dirs = [d for d in template_search_dirs if os.path.isdir(d)]
-if not valid_template_dirs:
-    valid_template_dirs = [os.path.join(CURRENT_DIR, "templates")]
-
-# Static directory
-static_dir = os.path.join(CURRENT_DIR, "static")
-if not os.path.isdir(static_dir):
-    static_dir = os.path.join(PARENT_DIR, "static")
+# If running at root rather than api subfolder, fallback
+if not os.path.exists(TEMPLATE_DIR):
+    TEMPLATE_DIR = os.path.join(os.path.dirname(BASE_DIR), "templates")
+if not os.path.exists(STATIC_DIR):
+    STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "static")
 
 app = Flask(
     __name__,
-    template_folder=valid_template_dirs[0],
-    static_folder=static_dir,
+    template_folder=TEMPLATE_DIR,
+    static_folder=STATIC_DIR,
 )
-app.jinja_loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(d) for d in valid_template_dirs])
 app.secret_key = os.environ.get("SECRET_KEY", "brainbox-demo-secret-key-change-me")
+
+# Expose both app and handler for all Vercel WSGI runtimes
+handler = app
 
 def get_database_path():
     if os.environ.get("DATABASE_PATH"):
         return os.environ.get("DATABASE_PATH")
     
-    # Check if running in cloud / serverless / readonly environment
-    is_serverless = bool(
-        os.environ.get("VERCEL")
-        or os.environ.get("VERCEL_ENV")
-        or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
-        or os.environ.get("LAMBDA_TASK_ROOT")
-        or os.environ.get("NOW_REGION")
-    )
-    if is_serverless:
+    # On Linux (Vercel Serverless / Lambda / Render), use /tmp/brainbox.db
+    if sys.platform != "win32" or os.environ.get("VERCEL"):
         return os.path.join(tempfile.gettempdir(), "brainbox.db")
     
-    local_path = os.path.join(CURRENT_DIR, "brainbox.db")
-    try:
-        test_file = os.path.join(CURRENT_DIR, ".db_write_test")
-        with open(test_file, "w") as f:
-            f.write("ok")
-        os.remove(test_file)
-        return local_path
-    except Exception:
-        return os.path.join(tempfile.gettempdir(), "brainbox.db")
+    # Local Windows development
+    return os.path.join(os.path.dirname(BASE_DIR), "brainbox.db")
 
 SUBJECTS = {
     "Python": ["Basics", "Functions", "OOP"],
@@ -448,11 +424,6 @@ def server_error(e):
 @app.errorhandler(404)
 def not_found(e):
     return redirect(url_for("home"))
-
-try:
-    init_db()
-except Exception:
-    pass
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
