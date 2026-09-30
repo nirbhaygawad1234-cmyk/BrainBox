@@ -15,7 +15,12 @@ app.secret_key = os.environ.get("SECRET_KEY", "brainbox-demo-secret-key-change-m
 def get_database_path():
     if os.environ.get("DATABASE_PATH"):
         return os.environ.get("DATABASE_PATH")
-    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    if (
+        os.environ.get("VERCEL")
+        or os.environ.get("VERCEL_ENV")
+        or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+        or os.environ.get("LAMBDA_TASK_ROOT")
+    ):
         return "/tmp/brainbox.db"
     
     local_path = os.path.join(BASE_DIR, "brainbox.db")
@@ -403,7 +408,10 @@ def initialize():
     flash("Database initialized successfully.", "success")
     return redirect(url_for("home"))
 
-init_db()
+try:
+    init_db()
+except Exception:
+    pass
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
