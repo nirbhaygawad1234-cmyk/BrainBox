@@ -189,6 +189,10 @@ def admin_required(view):
 def inject_common():
     return {"subjects": SUBJECTS}
 
+@app.route("/health")
+def health():
+    return {"status": "ok", "app": "BrainBox", "database": get_database_path()}
+
 @app.route("/")
 def home():
     return render_template("index.html")
