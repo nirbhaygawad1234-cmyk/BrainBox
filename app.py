@@ -3,13 +3,29 @@ import sqlite3
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 
+import jinja2
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Find all possible template locations (root, api subfolder, cwd, /var/task)
+possible_template_dirs = [
+    os.path.join(BASE_DIR, "templates"),
+    os.path.join(os.getcwd(), "templates"),
+    os.path.abspath("templates"),
+    os.path.join(os.path.dirname(BASE_DIR), "templates"),
+    os.path.join(BASE_DIR, "api", "templates"),
+    "/var/task/templates",
+]
+valid_template_dirs = [d for d in possible_template_dirs if os.path.isdir(d)]
+if not valid_template_dirs:
+    valid_template_dirs = [os.path.join(BASE_DIR, "templates")]
 
 app = Flask(
     __name__,
-    template_folder=os.path.join(BASE_DIR, "templates"),
+    template_folder=valid_template_dirs[0],
     static_folder=os.path.join(BASE_DIR, "static"),
 )
+app.jinja_loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(d) for d in valid_template_dirs])
 app.secret_key = os.environ.get("SECRET_KEY", "brainbox-demo-secret-key-change-me")
 
 def get_database_path():
@@ -408,6 +424,19 @@ def initialize():
     flash("Database initialized successfully.", "success")
     return redirect(url_for("home"))
 
+@app.errorhandler(500)
+def server_error(e):
+    import traceback
+    tb = traceback.format_exc()
+    try:
+        return render_template("index.html"), 200
+    except Exception:
+        return f"<h3>BrainBox Server Error</h3><pre>{tb}</pre>", 500
+
+@app.errorhandler(404)
+def not_found(e):
+    return redirect(url_for("home"))
+
 try:
     init_db()
 except Exception:
@@ -415,4 +444,5 @@ except Exception:
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+
 

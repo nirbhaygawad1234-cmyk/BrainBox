@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="result-hero">
+  <span class="badge">Quiz Completed</span>
+  <h1>{{ attempt['percentage'] }}%</h1>
+  <p>You scored <strong>{{ attempt['score'] }}/{{ attempt['total'] }}</strong> in {{ attempt['topic'] }}.</p>
+  {% if attempt['percentage'] < 60 %}
+    <div class="result-message danger">This topic has been added to your revision focus list.</div>
+  {% else %}
+    <div class="result-message success">Good work! Keep practicing to strengthen your understanding.</div>
+  {% endif %}
+  <a class="button" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</div>
+
+<div class="section">
+  <h2>Answer Review</h2>
+  {% for d in details %}
+    <div class="review-card {% if d['selected_answer'] == d['correct_answer'] %}correct{% else %}wrong{% endif %}">
+      <h3>{{ loop.index }}. {{ d['question'] }}</h3>
+      <p><strong>Your answer:</strong> {{ d['selected_answer'] or 'Not answered' }}</p>
+      <p><strong>Correct answer:</strong> {{ d['correct_answer'] }}</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

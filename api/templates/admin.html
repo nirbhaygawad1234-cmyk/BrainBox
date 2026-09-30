@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><span class="badge">Admin Panel</span><h1>Manage BrainBox</h1><p>Add questions and view application activity.</p></div>
+
+<div class="form-card wide">
+  <h2>Add Question</h2>
+  <form method="post" action="{{ url_for('add_question') }}">
+    <div class="two-col">
+      <div><label>Subject</label><select name="subject" id="subject" onchange="updateTopics()" required>
+        {% for subject in subjects %}<option value="{{ subject }}">{{ subject }}</option>{% endfor %}
+      </select></div>
+      <div><label>Topic</label><select name="topic" id="topic" required></select></div>
+    </div>
+    <label>Question</label><textarea name="question" required></textarea>
+    <div class="two-col">
+      <div><label>Option A</label><input name="option_a" required></div>
+      <div><label>Option B</label><input name="option_b" required></div>
+      <div><label>Option C</label><input name="option_c" required></div>
+      <div><label>Option D</label><input name="option_d" required></div>
+    </div>
+    <label>Correct Answer (must exactly match one option)</label><input name="correct" required>
+    <button class="button" type="submit">Add Question</button>
+  </form>
+</div>
+
+<div class="section">
+<h2>Question Bank</h2>
+<div class="table-wrap"><table><tr><th>ID</th><th>Subject</th><th>Topic</th><th>Question</th><th>Action</th></tr>
+{% for q in questions %}
+<tr><td>{{ q['id'] }}</td><td>{{ q['subject'] }}</td><td>{{ q['topic'] }}</td><td>{{ q['question'] }}</td><td>
+<form method="post" action="{{ url_for('delete_question', qid=q['id']) }}"><button class="small-danger">Delete</button></form>
+</td></tr>
+{% endfor %}
+</table></div>
+</div>
+
+<div class="section">
+<h2>Recent Users</h2>
+<div class="table-wrap"><table><tr><th>Name</th><th>Email</th><th>Role</th></tr>
+{% for u in users %}<tr><td>{{ u['name'] }}</td><td>{{ u['email'] }}</td><td>{{ u['role'] }}</td></tr>{% endfor %}
+</table></div>
+</div>
+
+<div class="section">
+<h2>Recent Attempts</h2>
+<div class="table-wrap"><table><tr><th>Student</th><th>Subject</th><th>Topic</th><th>Score</th><th>Percentage</th></tr>
+{% for a in attempts %}<tr><td>{{ a['name'] }}</td><td>{{ a['subject'] }}</td><td>{{ a['topic'] }}</td><td>{{ a['score'] }}/{{ a['total'] }}</td><td>{{ a['percentage'] }}%</td></tr>{% endfor %}
+</table></div>
+</div>
+
+<script>
+const subjectTopics = {{ subjects|tojson }};
+function updateTopics(){
+  const subject = document.getElementById("subject").value;
+  const topic = document.getElementById("topic");
+  topic.innerHTML = "";
+  (subjectTopics[subject] || []).forEach(t => {
+    const option = document.createElement("option");
+    option.value = t; option.textContent = t; topic.appendChild(option);
+  });
+}
+updateTopics();
+</script>
+{% endblock %}

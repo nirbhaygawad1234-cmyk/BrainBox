@@ -1,0 +1,28 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f6f7fb;color:#172033;line-height:1.6}
+a{color:#4f46e5;text-decoration:none}
+.navbar{height:70px;background:#fff;border-bottom:1px solid #e7e9ef;display:flex;align-items:center;justify-content:space-between;padding:0 7%;position:sticky;top:0;z-index:10}
+.brand{font-size:1.5rem;font-weight:800;color:#171a2b}
+.navlinks{display:flex;gap:20px;align-items:center}.navlinks a{color:#40465a}.navbutton{padding:9px 15px;background:#171a2b;color:#fff!important;border-radius:10px}
+.container{width:min(1100px,92%);margin:0 auto;padding:42px 0 70px}
+.hero{min-height:480px;display:grid;grid-template-columns:1.25fr .75fr;gap:35px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,6vw,5rem);line-height:1.05;margin:15px 0}.hero h1 span{color:#4f46e5}.hero p{font-size:1.15rem;color:#646b7d;max-width:650px}
+.badge{display:inline-block;background:#ecebff;color:#4f46e5;padding:6px 11px;border-radius:999px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.button{display:inline-block;border:0;background:#4f46e5;color:#fff;padding:12px 20px;border-radius:11px;font-weight:700;cursor:pointer;margin-top:10px}.button.secondary{background:#e9eaf0;color:#23283a;margin-left:7px}
+.hero-card,.card,.form-card,.question-card,.review-card{background:#fff;border:1px solid #e6e8ef;border-radius:18px;padding:24px;box-shadow:0 10px 30px rgba(30,35,60,.05)}
+.hero-card{text-align:center}.score-circle{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;border:12px solid #e4e2ff;color:#4f46e5;font-size:2rem;font-weight:800;margin:10px auto 25px}
+.cards{display:grid;gap:18px}.cards.three{grid-template-columns:repeat(3,1fr)}.three .card h3{margin-top:0}
+.form-card{width:min(520px,100%);margin:30px auto}.form-card.wide{width:100%;max-width:900px}
+form{display:grid;gap:10px}label{font-weight:700;margin-top:6px}input,select,textarea{width:100%;padding:12px;border:1px solid #dfe2ea;border-radius:10px;font:inherit;background:#fff}textarea{min-height:100px;resize:vertical}
+.page-head{margin-bottom:28px}.page-head h1{font-size:2.4rem;margin:8px 0 0}.section{margin-top:38px}.section h2{margin-bottom:15px}
+.quiz-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.topic-link{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eee;color:#31374a}.topic-link:last-child{border-bottom:0}
+.stat span{color:#747b8e}.stat strong{display:block;font-size:2rem;margin-top:5px}.empty{text-align:center}
+.table-wrap{overflow-x:auto;background:#fff;border:1px solid #e6e8ef;border-radius:14px}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:13px;border-bottom:1px solid #eee}th{background:#f8f8fb}
+.pill{padding:5px 9px;border-radius:999px;font-weight:700}.danger-pill{background:#ffe8e8;color:#b42318}
+.question-card{margin-bottom:18px}.question-card h3{margin-top:0}.option{display:flex;align-items:center;gap:10px;border:1px solid #e1e4ec;padding:12px;border-radius:10px;margin:8px 0;cursor:pointer;font-weight:500}.option:hover{background:#f8f8ff}.option input{width:auto}
+.result-hero{text-align:center;background:#fff;border:1px solid #e6e8ef;border-radius:20px;padding:40px}.result-hero h1{font-size:4.5rem;color:#4f46e5;margin:8px}.result-message{max-width:600px;margin:18px auto;padding:12px;border-radius:10px}.result-message.success{background:#e7f8ef;color:#17663c}.result-message.danger{background:#ffe8e8;color:#a61b1b}
+.review-card{margin-bottom:12px}.review-card.correct{border-left:6px solid #24a46b}.review-card.wrong{border-left:6px solid #e55353}
+.alert{padding:12px 15px;border-radius:10px;margin-bottom:18px}.alert.success{background:#e7f8ef;color:#17663c}.alert.danger{background:#ffe8e8;color:#a61b1b}.alert.warning{background:#fff3d6;color:#7b5600}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:15px}.small-danger{border:0;background:#ffe8e8;color:#a61b1b;padding:7px 10px;border-radius:8px;cursor:pointer}
+footer{text-align:center;padding:25px;color:#858b9b;border-top:1px solid #e7e9ef;background:#fff}
+@media(max-width:800px){.hero{grid-template-columns:1fr}.cards.three,.quiz-select-grid{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}.navbar{padding:0 4%;}.navlinks{gap:10px}.container{padding-top:25px}.hero{min-height:auto;padding:30px 0}}

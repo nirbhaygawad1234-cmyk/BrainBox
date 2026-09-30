@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head">
+  <div><span class="badge">Student Dashboard</span><h1>Hello, {{ session.get('name') }}!</h1><p>Choose a topic and start practicing.</p></div>
+</div>
+
+<div class="cards three">
+  <div class="stat card"><span>Total Attempts</span><strong>{{ stats['attempts'] }}</strong></div>
+  <div class="stat card"><span>Average Score</span><strong>{{ stats['avg_score'] }}%</strong></div>
+  <div class="stat card"><span>Revision Topics</span><strong>{{ weak|length }}</strong></div>
+</div>
+
+<div class="section">
+  <h2>Start a Quiz</h2>
+  <div class="quiz-select-grid">
+  {% for subject, topics in subjects.items() %}
+    <div class="card">
+      <h3>{{ subject }}</h3>
+      {% for topic in topics %}
+        <a class="topic-link" href="{{ url_for('quiz', subject=subject, topic=topic) }}">{{ topic }} <span>→</span></a>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  </div>
+</div>
+
+<div class="section">
+  <h2>Topics to Revise</h2>
+  {% if weak %}
+    <div class="table-wrap"><table>
+      <tr><th>Subject</th><th>Topic</th><th>Average</th><th>Action</th></tr>
+      {% for item in weak %}
+      <tr><td>{{ item['subject'] }}</td><td>{{ item['topic'] }}</td><td><span class="pill danger-pill">{{ item['avg_percentage'] }}%</span></td><td><a href="{{ url_for('quiz', subject=item['subject'], topic=item['topic']) }}">Revise</a></td></tr>
+      {% endfor %}
+    </table></div>
+  {% else %}
+    <div class="empty card"><h3>No weak topics yet</h3><p>Attempt quizzes and BrainBox will highlight topics below 60%.</p></div>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2>Recent Attempts</h2>
+  {% if attempts %}
+  <div class="table-wrap"><table>
+    <tr><th>Subject</th><th>Topic</th><th>Score</th><th>Percentage</th><th>Date</th></tr>
+    {% for a in attempts %}
+    <tr><td>{{ a['subject'] }}</td><td>{{ a['topic'] }}</td><td>{{ a['score'] }}/{{ a['total'] }}</td><td>{{ a['percentage'] }}%</td><td>{{ a['taken_at'] }}</td></tr>
+    {% endfor %}
+  </table></div>
+  {% else %}
+    <div class="empty card"><p>No quiz attempts yet. Pick a topic above to begin.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
